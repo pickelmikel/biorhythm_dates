@@ -1,5 +1,6 @@
 from datetime import date
 import numpy as np
+import streamlit as st
 
 def get_birth_sign(dt):
     # Zodiac sign date ranges (month, day): (start, end)
@@ -67,3 +68,15 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
     # Add birth sign to each date
     perfect_dates_with_sign = [(dt, get_birth_sign(dt)) for dt in perfect_dates]
     return perfect_dates_with_sign
+
+st.title('Perfect Compatibility Finder')
+
+byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year, value=2000)
+bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12, value=1)
+bday = st.number_input('Enter your birth day:', min_value=1, max_value=31, value=1)
+
+if st.button('Find Perfect Compatibility Dates'):
+    birth_date = date(byear, bmonth, bday)
+    compat_dates = find_perfect_compat_dates(birth_date)
+    for dt, sign in compat_dates:
+        st.write(f"{dt}: {sign}")
