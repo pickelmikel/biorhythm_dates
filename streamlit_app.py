@@ -60,8 +60,9 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
                         break
                 if all_perfect:
                     if other_date == birth_date:
-                        other_date = other_date + ' --your birthdate'
-                    perfect_dates.add(other_date)
+                        pass
+                    else:
+                        perfect_dates.add(other_date)
             except ValueError:
                 continue  # skip invalid dates
 
@@ -76,11 +77,9 @@ st.title('Perfect Compatibility Finder')
 byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year, value=2000)
 bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12, value=1)
 bday = st.number_input('Enter your birth day:', min_value=1, max_value=31, value=1)
-nyears = st.number_input('How many years difference to display:', value=25)
+nyears = st.number_input('How many years difference to display:', min_value=4, value=25)
 
 if st.button('Find Perfect Compatibility Dates'):
     birth_date = date(byear, bmonth, bday)
     compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
-    st.dataframe(data=compat_dates, column_config={1:'compatible dates',2:'birth sign (Western)'})
-    #for dt, sign in compat_dates:
-    #    st.write(f"{dt}: {sign}")
+    st.dataframe(data=compat_dates, column_config={1:'compatible dates',2:'birth sign (Western)'}, width='content', height='content')
