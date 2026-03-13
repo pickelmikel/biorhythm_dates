@@ -124,7 +124,7 @@ bday = st.number_input('Enter your birth day:', min_value=1, max_value=31,\
 birth_date = st.date_input('Select your birthdate', value=date(2000,1,1), min_value=date(1900,1,1), max_value=date.today(),\
              key='birth_date', format='YYYY-MM-DD', width=120)
 nyears = st.number_input('How many years difference to display:', min_value=4,\
-         value=25, key='nyears')
+         value=25, key='nyears', width=120)
 
 #if st.button('Find Perfect Compatibility Dates'):
     #birth_date = date(byear, bmonth, bday)
