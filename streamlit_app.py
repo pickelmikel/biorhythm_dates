@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 def biorhythm_high_res(birth_date, target_date):
@@ -129,7 +130,9 @@ nyears = st.number_input('How many years difference to display:', min_value=4,\
 #if st.button('Find Perfect Compatibility Dates'):
     #birth_date = date(byear, bmonth, bday)
 compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
-st.table(data=compat_dates, border='horizontal')
+df = pd.DataFrame(compat_dates)
+
+st.table(data=df, border='horizontal')
              #column_config={1:'Compatible Dates',2:'Birth Sign',3:'Overall Compatability'},
              #height='content')
 
