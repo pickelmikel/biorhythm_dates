@@ -129,9 +129,9 @@ nyears = st.number_input('How many years difference to display:', min_value=4,\
 #if st.button('Find Perfect Compatibility Dates'):
     #birth_date = date(byear, bmonth, bday)
 compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
-st.data_editor(data=compat_dates,
-             column_config={1:'Compatible Dates',2:'Birth Sign',3:'Overall Compatability'},
-             height='content')
+st.table(data=compat_dates)
+             #column_config={1:'Compatible Dates',2:'Birth Sign',3:'Overall Compatability'},
+             #height='content')
 
 
 st.write('*Dates are in YEAR-MONTH-DAY format')
