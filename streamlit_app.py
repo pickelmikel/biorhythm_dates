@@ -105,14 +105,14 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
 
 
 st.title('Perfect Compatibility Finder')
-
+# Playing with using a calendar to select birth_date
 old_date_input = '''byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year,\
         value=2000, key='byear')
 bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12,\
          value=1, key='bmonth')
 bday = st.number_input('Enter your birth day:', min_value=1, max_value=31,\
        value=1, key='bday')'''
-birth_date = st.date_input('Select your birthdate')
+birth_date = st.date_input('Select your birthdate', value=date(2000,1,1), min_value=date(1900,1,1), max_value=date.today(), key='birth_date')
 nyears = st.number_input('How many years difference to display:', min_value=4,\
          value=25, key='nyears')
 
