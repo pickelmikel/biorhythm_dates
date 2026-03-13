@@ -2,8 +2,6 @@ from datetime import date, datetime, timedelta
 import numpy as np
 import streamlit as st
 
-from datetime import datetime, timedelta
-
 def biorhythm_high_res(birth_date, target_date):
     # Calculate age in days
     delta = (target_date - birth_date).days
@@ -117,11 +115,14 @@ birth_date = st.date_input('Select your birthdate', value=date(2000,1,1), min_va
 nyears = st.number_input('How many years difference to display:', min_value=4,\
          value=25, key='nyears')
 
-if st.button('Find Perfect Compatibility Dates'):
+#if st.button('Find Perfect Compatibility Dates'):
     #birth_date = date(byear, bmonth, bday)
-    compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
-    st.dataframe(data=compat_dates, column_config={1:'Compatible Dates',2:'Birth Sign',3:'Compatibility Score'},\
-    height='content')
+compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
+st.dataframe(data=compat_dates,
+             column_config={1:'Compatible Dates',2:'Birth Sign',3:'Compatibility Score'},
+             height='content')
+
+
 st.write('*Dates are in YEAR-MONTH-DAY format')
 st.write('Scores Between 0-1: Low compatibility. Difficulty connecting in various aspects.')
 st.write('Scores of 1-2: Moderate to strong compatibility. There might be some areas of connection but not ideal.')
