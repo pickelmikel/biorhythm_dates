@@ -106,17 +106,18 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
 
 st.title('Perfect Compatibility Finder')
 
-byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year,\
+'''byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year,\
         value=2000, key='byear')
 bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12,\
          value=1, key='bmonth')
 bday = st.number_input('Enter your birth day:', min_value=1, max_value=31,\
-       value=1, key='bday')
+       value=1, key='bday')'''
+birth_date = st.date_input('Select your birthdate')
 nyears = st.number_input('How many years difference to display:', min_value=4,\
          value=25, key='nyears')
 
 if st.button('Find Perfect Compatibility Dates'):
-    birth_date = date(byear, bmonth, bday)
+    #birth_date = date(byear, bmonth, bday)
     compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
     st.dataframe(data=compat_dates, column_config={1:'Compatible Dates',2:'Birth Sign',3:'Compatibility Score'},\
     height='content')
