@@ -130,7 +130,7 @@ nyears = st.number_input('How many years difference to display:', min_value=4,\
 #if st.button('Find Perfect Compatibility Dates'):
     #birth_date = date(byear, bmonth, bday)
 compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
-df = pd.DataFrame(compat_dates)
+df = pd.DataFrame(compat_dates, columns=['Compatible Dates','Birth Sign','Overall Compatability'])
 
 st.table(data=df, border='horizontal')
              #column_config={1:'Compatible Dates',2:'Birth Sign',3:'Overall Compatability'},
