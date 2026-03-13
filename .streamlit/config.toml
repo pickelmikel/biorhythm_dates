@@ -1,13 +1,12 @@
 # .streamlit/config.toml
 [theme]
 base = "dark"
-
-[browser]
-Viewport = "width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes"
-gatherUsageStats = false
 # optional extras you can tweak:
 # primaryColor="#1abc9c"
 # backgroundColor="#0e1117"
 # secondaryBackgroundColor="#262730"
 # textColor="#fafafa"
 # font="sans serif"
+
+[browser]
+gatherUsageStats = false
