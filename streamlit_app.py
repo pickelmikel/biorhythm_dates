@@ -94,7 +94,7 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
                 all_perfect = True
                 for c2, v2 in T.items():
                     form = np.cos(np.pi * delta / v2)
-                    if not (abs(form) >= 0.99 - tol):
+                    if not (abs(form) >= 1 - tol):
                         all_perfect = False
                         break
                 if all_perfect:
@@ -130,12 +130,12 @@ nyears = st.number_input('How many years difference to display:', min_value=4,\
     #birth_date = date(byear, bmonth, bday)
 compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
 st.dataframe(data=compat_dates,
-             column_config={1:'Compatible Dates',2:'Birth Sign',3:'Compatibility Score'},
+             column_config={1:'Compatible Dates',2:'Birth Sign',3:'Overall Compatability'},
              height='content')
 
 
 st.write('*Dates are in YEAR-MONTH-DAY format')
-st.write('Scores Between 0-1: Low compatibility. Difficulty connecting in various aspects.')
-st.write('Scores of 1-2: Moderate to strong compatibility. There might be some areas of connection but not ideal.')
-st.write('Scores Above 2: Excellent compatibility, indicating a high likelihood of productive relationships and connections.\
- Significant synergy across all cycles.')
+#st.write('Scores Between 0-1: Low compatibility. Difficulty connecting in various aspects.')
+#st.write('Scores of 1-2: Moderate to strong compatibility. There might be some areas of connection but not ideal.')
+#st.write('Scores Above 2: Excellent compatibility, indicating a high likelihood of productive relationships and connections.\
+ #Significant synergy across all cycles.')
