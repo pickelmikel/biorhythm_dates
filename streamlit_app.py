@@ -95,7 +95,7 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
                 all_perfect = True
                 for c2, v2 in T.items():
                     form = np.cos(np.pi * delta / v2)
-                    if not (abs(form) >= 1 - tol):
+                    if not (abs(form) >= .9 - tol):
                         all_perfect = False
                         break
                 if all_perfect:
@@ -134,7 +134,7 @@ columns = ['Compatible Dates','Birth Sign','Overall Compatability']
 df = pd.DataFrame(compat_dates, columns=columns)
 df[columns[2]] = df[columns[2]].apply(lambda x: round(x,2))
 df.reset_index(drop=True)
-st.table(data=df.set_index(columns[0]), border='horizontal')
+st.table(data=df.set_index(columns[0]))
              #column_config={1:'Compatible Dates',2:'Birth Sign',3:'Overall Compatability'},
              #height='content')
 
