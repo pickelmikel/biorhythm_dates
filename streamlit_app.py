@@ -172,7 +172,7 @@ try:
     st.bar_chart(b, sort=False,
                  stack=False,
                  x=None,
-                 x=None,
+                 y=None,
                  #y_label='Percent Compatible',
                  x_label='Percent Compatibility on Day of Birth',
                  horizontal=True)
