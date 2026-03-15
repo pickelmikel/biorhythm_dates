@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 import numpy as np
 import pandas as pd
 import streamlit as st
-import plotly.express as px
+#import plotly.express as px
 
 #fig = px.bar(df, x='Category', y='Value')
 #fig.update_xaxes(tickangle=0)  # 0 degrees = horizontal labels
