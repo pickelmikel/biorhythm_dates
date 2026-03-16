@@ -7,8 +7,7 @@ import streamlit as st
 #fig = px.bar(df, x='Category', y='Value')
 #fig.update_xaxes(tickangle=0)  # 0 degrees = horizontal labels
 #st.plotly_chart(fig)
-
-disclaimer = "Disclaimer: Due to the early stage of development information provided may be inaccurate or change without notice. Currently only finds at least one cycle with 100%. This will change as it will find dates with all at least above 80%."
+disclaimer = "Disclaimer: Due to the early stage of development information provided may be inaccurate or change without notice. Currently finds dates with all cycles at least 80%."
 
 def biorhythm_high_res(birth_date, target_date):
     # Calculate age in days
@@ -32,6 +31,7 @@ def biorhythm(birth_date, target_date):
     
     return physical, emotional, intellectual
 
+@st.cache_data
 def bio_compat(your_birth, other_birth):
     T = {'Physical':23, 'Emotional':28, 'Intellectual':33}
     t = your_birth - other_birth
@@ -102,7 +102,7 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
                 all_perfect = True
                 for c2, v2 in T.items():
                     form = np.cos(np.pi * delta / v2)
-                    if not (abs(form) >= .3 - tol):
+                    if not (abs(form) >= .8 - tol):
                         all_perfect = False
                         break
                 if all_perfect:
@@ -114,11 +114,30 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
                         perfect_dates.add((other_date, get_birth_sign(other_date), score))
             except ValueError:
                 continue  # skip invalid dates
-
     perfect_dates = list(perfect_dates)
     # Sort by compatibility score (highest first)
     perfect_dates.sort(key=lambda x: x[2],reverse=True)
     return perfect_dates
+
+@st.cache_data
+def find_good_compat_dates(birth_date, years=4, threshold=0.8):
+    T = {'Physical': 23, 'Emotional': 28, 'Intellectual': 33}
+    good_dates = []
+    min_delta = -years * 366
+    max_delta = years * 366
+    for delta in range(min_delta, max_delta + 1):
+        other_ord = birth_date.toordinal() + delta
+        try:
+            other_date = date.fromordinal(other_ord)
+            compat = [abs(np.cos(np.pi * delta / period)) for period in T.values()]
+            mean_compat = np.mean(compat)
+            if min(compat) >= threshold:
+                good_dates.append((other_date, get_birth_sign(other_date), *[round(x,5) for x in compat], round(mean_compat,3)))
+                good_dates.sort(key=lambda x: x[-1], reverse=True)
+        except ValueError:
+            continue
+    return good_dates
+
 
 def show_details():
     try:
@@ -126,8 +145,11 @@ def show_details():
         st.write(birth_date)
     except IndexError:
         pass
+
+## -- MAIN DISPLAY CODE -- ##
 st.info(disclaimer)
 st.title('Perfect Compatibility Finder')
+
 # Playing with using a calendar to select birth_date
 old_date_input = '''byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year,\
         value=2000, key='byear')
@@ -135,6 +157,7 @@ bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12,\
          value=1, key='bmonth')
 bday = st.number_input('Enter your birth day:', min_value=1, max_value=31,\
        value=1, key='bday')'''
+
 birth_date = st.date_input('Select your birthdate',
                            #value=date(2000,1,1),
                            min_value=date(1900,1,1),
@@ -142,42 +165,49 @@ birth_date = st.date_input('Select your birthdate',
                            key='birth_date',
                            format='YYYY-MM-DD')
 nyears = st.number_input('How many years difference to display:',
-                         min_value=4,
+                         min_value=1,
                          max_value=100,
-                         value=25,
+                         value=4,
                          key='nyears')
 
 #if st.button('Find Perfect Compatibility Dates'):
     #birth_date = date(byear, bmonth, bday)
-compat_dates = find_perfect_compat_dates(birth_date, years=nyears)
-columns = ['Compatible Dates','Birth Sign','Overall Compatibility']
-df = pd.DataFrame(compat_dates, columns=columns)
-df[columns[2]] = df[columns[2]].round(2)
-df.reset_index(drop=True)
+#st.divider()
 
+columns = ['Compatible Dates','Birth Sign','Physical' ,'Emotional', 'Intellectual' , 'Overall Compatibility']
+columns_with_bars = ['Compatible Dates','Birth Sign','Physical|Emotional|Intellectual' , 'Overall Compatibility']
+good_compat_dates = find_good_compat_dates(birth_date, years=nyears)
+gdf = pd.DataFrame(good_compat_dates, columns=columns)
 
-
-st.divider()
-#st.table(df.set_index(columns[0]).style.format({columns[2]: '{:.2f}'}))
-a = st.dataframe(data=df.set_index(columns[0]),
-             #column_config={1:'Compatible Dates',2:'Birth Sign',3:'Overall Compatibility'},
-             height='auto',
+a_col_config = {
+    'Physical':st.column_config.NumberColumn(format='percent'),
+    'Emotional':st.column_config.NumberColumn(format='percent'),
+    'Intellectual':st.column_config.NumberColumn(format='percent'),
+    'Overall Compatibility':st.column_config.NumberColumn(format='percent')
+    }
+a = st.dataframe(gdf,
              selection_mode='single-row',
+             column_config=a_col_config,
              on_select='rerun')
 
+#st.table(df.set_index(columns[0]).style.format({columns[2]: '{:.2f}'}))
+
+# Bar chart config
 try:
-    b = bio_compat(birth_date, df.iloc[a.get('selection')['rows'][0]][0])[0]
+    #st.write()
+    b = bio_compat(birth_date, gdf.iloc[a.get('selection')['rows'][0]].iloc[0])[0]
     b = pd.DataFrame([b],columns=['Physical', 'Emotional', 'Intellectual'])
     b.index = ['Compatibility on Day of Birth']
     b = b.mul(100)
+    st.table(b)
+    b.index = ['']
     st.bar_chart(b, sort=False,
                  stack=False,
                  x=None,
-                 y=None,
-                 #y_label='Percent Compatible',
-                 x_label='Percent Compatibility on Day of Birth',
+                 y_label='Percent Compatible',
+                 x_label='Compatibility on Day of Birth',
                  horizontal=True)
-    st.table(b)
+    #st.table(b)
 except IndexError:
     pass
 
