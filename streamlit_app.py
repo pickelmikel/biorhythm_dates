@@ -219,7 +219,8 @@ try:
     bdf = pd.DataFrame([b],columns=['Physical', 'Emotional', 'Intellectual'])
     bdf.index = ['Compatibility on Day of Birth']
     bdf = bdf.mul(100)
-    #st.write(b.values())
+    bvals = np.array([x for x in b.values()])
+    st.table(bvals)
     
     bdf.index = ['']
     st.bar_chart(bdf, sort=False,
