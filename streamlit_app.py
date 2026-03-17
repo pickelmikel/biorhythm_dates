@@ -223,7 +223,7 @@ try:
     bdfd = bdf[:]
     bdfd['Overall'] = bdfd.agg('mean')
     order = ['Overall','Physical', 'Emotional', 'Intellectual']
-    st.table(bdfd)
+    st.table(bdfd[[order]])
     
     bdf.index = ['']
     st.bar_chart(bdf, sort=False,
