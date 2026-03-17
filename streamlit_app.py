@@ -204,7 +204,7 @@ try:
     bdf = pd.DataFrame([b],columns=['Physical', 'Emotional', 'Intellectual'])
     b.index = ['Compatibility on Day of Birth']
     bdf = bdf.mul(100)
-    st.table([bdf,b[-1])
+    st.table(bdf,b[-1])
     b.index = ['']
     st.bar_chart(b, sort=False,
                  stack=False,
