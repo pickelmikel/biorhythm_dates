@@ -201,10 +201,10 @@ a = st.dataframe(gdf,
 try:
     #st.write()
     b = bio_compat(birth_date, gdf.iloc[a.get('selection')['rows'][0]].iloc[0])[0]
-    b = pd.DataFrame([b],columns=['Physical', 'Emotional', 'Intellectual'])
+    bdf = pd.DataFrame([b],columns=['Physical', 'Emotional', 'Intellectual'])
     b.index = ['Compatibility on Day of Birth']
-    b = b.mul(100)
-    st.table(b)
+    bdf = bdf.mul(100)
+    st.table([bdf,b[-1])
     b.index = ['']
     st.bar_chart(b, sort=False,
                  stack=False,
