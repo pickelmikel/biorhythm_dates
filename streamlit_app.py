@@ -135,7 +135,7 @@ def find_good_compat_dates(birth_date, years=4, threshold=0.8):
             dir2 = [-np.pi / period * np.sin(0) for period in T.values()]  # reference person at t=0
             # Check value threshold and same direction
             if min(compat) >= threshold and all(d1 * d2 >= 0 for d1, d2 in zip(dir1, dir2)):
-                good_dates.append((other_date, get_birth_sign(other_date), *[round(x,5) for x in compat], round(np.mean(compat),3)))
+                good_dates.append((other_date, get_birth_sign(other_date), *[round(x,5) for x in compat], np.mean(compat)))
                 good_dates.sort(key=lambda x: x[-1], reverse=True)
         except ValueError:
             continue
@@ -153,7 +153,7 @@ def show_details():
 st.info(disclaimer)
 st.title('Perfect Compatibility Finder')
 
-# Playing with using a calendar to select birth_date
+# Old date text input widgets
 old_date_input = '''byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year,\
         value=2000, key='byear')
 bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12,\
@@ -161,24 +161,26 @@ bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12,\
 bday = st.number_input('Enter your birth day:', min_value=1, max_value=31,\
        value=1, key='bday')'''
 
+## User Input widgets ##
 birth_date = st.date_input('Select your birthdate',
                            #value=date(2000,1,1),
                            min_value=date(1900,1,1),
                            max_value=date.today(),
                            key='birth_date',
                            format='YYYY-MM-DD')
+
 nyears = st.number_input('How many years difference to display:',
                          min_value=1,
                          max_value=100,
                          value=4,
                          key='nyears')
 
+# Removed Button for now...
 #if st.button('Find Perfect Compatibility Dates'):
     #birth_date = date(byear, bmonth, bday)
 #st.divider()
 
 columns = ['Compatible Dates','Birth Sign','Physical' ,'Emotional', 'Intellectual' , 'Overall Compatibility']
-#columns_with_bars = ['Compatible Dates','Birth Sign','Physical|Emotional|Intellectual' , 'Overall Compatibility']
 good_compat_dates = find_good_compat_dates(birth_date, years=nyears)
 gdf = pd.DataFrame(good_compat_dates, columns=columns)
 gdf = gdf.astype({'Birth Sign':'category'})
