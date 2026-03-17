@@ -221,8 +221,9 @@ try:
     bdf = bdf.mul(100)
     #bvals = np.array([x for x in b.values()])
     bdfd = bdf[:]
-    bdfd['Overall'] = bdfd.mean()
+    bdfd['Overall'] = bdfd.mean(numeric_only=True)
     order = ['Overall','Physical', 'Emotional', 'Intellectual']
+    
     st.table(bdfd[order])
     
     bdf.index = ['']
