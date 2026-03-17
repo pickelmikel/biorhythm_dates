@@ -220,7 +220,9 @@ try:
     bdf.index = ['Compatibility on Day of Birth']
     bdf = bdf.mul(100)
     #bvals = np.array([x for x in b.values()])
-    st.table(bdf)
+    bdfd = bdf[:]
+    bdfd['Overall'] = bdfd.mean()
+    st.table(bdfd)
     
     bdf.index = ['']
     st.bar_chart(bdf, sort=False,
