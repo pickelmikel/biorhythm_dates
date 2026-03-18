@@ -317,6 +317,7 @@ try:
     # Setting index to display on static table of selected match
     #bdf.index = ['Compatibility on Day of Birth']
     bdf.index = [other_date]
+    bdf.index.name = 'Result Date'
     # To get percentage
     bdf = bdf.mul(100)
     #bvals = np.array([x for x in b.values()])
