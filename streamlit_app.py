@@ -7,11 +7,18 @@ import streamlit as st
 #fig = px.bar(df, x='Category', y='Value')
 #fig.update_xaxes(tickangle=0)  # 0 degrees = horizontal labels
 #st.plotly_chart(fig)
-disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice. Currently finds dates with all cycles at least 80%."
+disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice."
 
 def check_state():
     if 'advanced' not in st.session_state:
         st.session_state.advanced = False
+    if 'Eval' not in st.session_state:
+        st.session_state.Eval = 0.8
+    if 'Ival' not in st.session_state:
+        st.session_state.Eval = 0.8
+    if 'Pval' not in st.session_state:
+        st.session_state.Eval = 0.8
+
 # Init session_state variables 
 check_state()
 
@@ -20,6 +27,11 @@ def set_advanced():
         st.session_state.advanced = True
     elif advanced_options.open == True:
         st.session_state.advanced = False
+
+def set_default_values():
+    st.session_state.Eval = 0.8
+    st.session_state.Ival = 0.8
+    st.session_state.Pval = 0.8
 
 def biorhythm_high_res(birth_date, target_date):
     # Calculate age in days
@@ -218,14 +230,33 @@ nyears = st.number_input('How many years difference to display:',
 
 ## Advanced explander section ##
 with st.expander('Advanced Options', on_change=set_advanced) as advanced_options:
-    'Select Cycle Thresholds -- Hide for Default of 80% for All Cycles'
-    E = st.slider('Emotional', value=80)
-    I = st.slider('Intellectual', value=80)
-    P = st.slider('Physical',value=80)
+    st.write('Select Cycle Thresholds')
+    E = st.slider('Emotional',
+                  value=0.8,
+                  format='percent',
+                  min_value=0.0,
+                  max_value=1.0,
+                  step=0.01,
+                  key='Eval')
+    I = st.slider('Intellectual',
+                  value=0.8,
+                  format='percent',
+                  min_value=0.0,
+                  max_value=1.0,
+                  step=0.01,
+                  key='Ival')
+    P = st.slider('Physical',
+                  value=0.8,
+                  format='percent',
+                  min_value=0.0,
+                  max_value=1.0,
+                  step=0.01,
+                  key='Pval')
+    st.button('Reset', on_click=set_default_values)
     
-st.session_state.advanced_values = {'Emotional':E /100,
-                                    'Intellectual':I/100,
-                                    'Physical':P/100}
+st.session_state.advanced_values = {'Emotional':E,
+                                    'Intellectual':I,
+                                    'Physical':P}
  
 # Testing displaying advanced state and values
 #advanced_options.open
@@ -248,13 +279,10 @@ good_order = ['Compatible Dates',
            'Birth Sign'
            ]
 # Checks if advanced options expander is open or closed
-if st.session_state.advanced == True:
-    good_compat_dates = find_good_compat_dates(
+good_compat_dates = find_good_compat_dates(
         birth_date,
         years=nyears,
         thresholds=st.session_state.advanced_values)
-elif st.session_state.advanced == False:
-    good_compat_dates = find_good_compat_dates(birth_date, years=nyears)
 
 gdf = pd.DataFrame(good_compat_dates, columns=columns)
 gdf = gdf.astype({'Birth Sign':'category'})
