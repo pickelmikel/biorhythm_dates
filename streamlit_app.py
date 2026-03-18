@@ -193,6 +193,14 @@ columns = ['Compatible Dates',
            'Intellectual',
            'Birth Sign'
            ]
+good_order = ['Compatible Dates',
+           'Overall Compatibility',
+           'Emotional',
+           'Intellectual',
+           'Physical',
+           'Birth Sign'
+           ]
+
 good_compat_dates = find_good_compat_dates(birth_date, years=nyears)
 gdf = pd.DataFrame(good_compat_dates, columns=columns)
 gdf = gdf.astype({'Birth Sign':'category'})
@@ -203,7 +211,7 @@ a_col_config = {
     #'Overall Compatibility':st.column_config.NumberColumn(format='percent')
     }
 st.write(f'Found {gdf.shape[0]} matches')
-a = st.dataframe(gdf,
+a = st.dataframe(gdf[good_order],
              selection_mode='single-row',
              column_config=a_col_config,
              on_select='rerun')
@@ -217,7 +225,9 @@ try:
     #st.write()
     b = bio_compat(birth_date, gdf.iloc[a.get('selection')['rows'][0]].iloc[0])[0]
     bdf = pd.DataFrame([b],columns=['Physical', 'Emotional', 'Intellectual'])
+    # Setting index to display on static table of selected match
     bdf.index = ['Compatibility on Day of Birth']
+    # To get percentage
     bdf = bdf.mul(100)
     #bvals = np.array([x for x in b.values()])
     bdfd = bdf[:]
@@ -225,7 +235,7 @@ try:
     order = ['Overall', 'Emotional', 'Intellectual', 'Physical']
     
     st.table(bdfd[order])
-    
+    # Blanking index because it shows funny on the screen
     bdf.index = ['']
     st.bar_chart(bdf, sort=False,
                  stack=False,
