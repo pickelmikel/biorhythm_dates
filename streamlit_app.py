@@ -9,6 +9,18 @@ import streamlit as st
 #st.plotly_chart(fig)
 disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice. Currently finds dates with all cycles at least 80%."
 
+def check_state():
+    if 'advanced' not in st.session_state:
+        st.session_state.advanced = False
+# Init session_state variables 
+check_state()
+
+def set_advanced():
+    if advanced_options.open == False:
+        st.session_state.advanced = True
+    elif advanced_options.open == True:
+        st.session_state.advanced = False
+
 def biorhythm_high_res(birth_date, target_date):
     # Calculate age in days
     delta = (target_date - birth_date).days
@@ -120,11 +132,35 @@ def find_perfect_compat_dates(birth_date, years=25, tol=0.01):
     return perfect_dates
 
 @st.cache_data
-def find_good_compat_dates(birth_date, years=4, threshold=0.8):
+def find_good_compat_dates(birth_date, years=4, threshold=0.8, thresholds=None):
+    """
+    birth_date:     date()
+    years:         int 
+    threshold:     float
+    thresholds:    dict()
+    """
+    
     T = {'Physical': 23, 'Emotional': 28, 'Intellectual': 33}
     good_dates = []
     min_delta = -years * 366
     max_delta = years * 366
+
+    # Determine thresholds for each cycle
+    if st.session_state.advanced is True and thresholds is not None:
+        # Use manual thresholds if advanced mode is True and thresholds provided
+        cycle_thresholds = {
+            'Physical': thresholds.get('Physical', threshold),
+            'Emotional': thresholds.get('Emotional', threshold),
+            'Intellectual': thresholds.get('Intellectual', threshold)
+        }
+    else:
+        # Use the same threshold for all cycles
+        cycle_thresholds = {
+            'Physical': threshold,
+            'Emotional': threshold,
+            'Intellectual': threshold
+        }
+
     for delta in range(min_delta, max_delta + 1):
         other_ord = birth_date.toordinal() + delta
         try:
@@ -133,13 +169,21 @@ def find_good_compat_dates(birth_date, years=4, threshold=0.8):
             # Derivatives for both people
             dir1 = [-np.pi / period * np.sin(np.pi * delta / period) for period in T.values()]
             dir2 = [-np.pi / period * np.sin(0) for period in T.values()]  # reference person at t=0
+
             # Check value threshold and same direction
-            if min(compat) >= threshold and all(d1 * d2 >= 0 for d1, d2 in zip(dir1, dir2)):
-                good_dates.append((other_date,
-                                   np.mean(compat) * 100, 
-                                   *compat,
-                                   get_birth_sign(other_date)
-                                   ))
+            compat_pass = all(
+                c >= cycle_thresholds[cycle]
+                for c, cycle in zip(compat, T.keys())
+            )
+            direction_pass = all(d1 * d2 >= 0 for d1, d2 in zip(dir1, dir2))
+
+            if compat_pass and direction_pass:
+                good_dates.append((
+                    other_date,
+                    np.mean(compat) * 100,
+                    *compat,
+                    get_birth_sign(other_date)
+                ))
                 good_dates.sort(key=lambda x: x[1], reverse=True)
         except ValueError:
             continue
@@ -153,17 +197,10 @@ def show_details():
     except IndexError:
         pass
 
+
 ## -- MAIN DISPLAY CODE -- ##
 st.info(disclaimer)
 st.title('Perfect Compatibility Finder')
-
-# Old date text input widgets
-old_date_input = '''byear = st.number_input('Enter your birth year:', min_value=1900, max_value=date.today().year,\
-        value=2000, key='byear')
-bmonth = st.number_input('Enter your birth month:', min_value=1, max_value=12,\
-         value=1, key='bmonth')
-bday = st.number_input('Enter your birth day:', min_value=1, max_value=31,\
-       value=1, key='bday')'''
 
 ## User Input widgets ##
 birth_date = st.date_input('Select your birthdate',
@@ -179,13 +216,23 @@ nyears = st.number_input('How many years difference to display:',
                          value=4,
                          key='nyears')
 
+## Advanced explander section ##
+with st.expander('Advanced Options', on_change=set_advanced) as advanced_options:
+    'Select Cycle Thresholds -- Hide for Default of 80% for All Cycles'
+    E = st.slider('Emotional', value=80)
+    I = st.slider('Intellectual', value=80)
+    P = st.slider('Physical',value=80)
+    
+st.session_state.advanced_values = {'Emotional':E /100,
+                                    'Intellectual':I/100,
+                                    'Physical':P/100}
+ 
+# Testing displaying advanced state and values
+#advanced_options.open
+#st.session_state.advanced
+#st.session_state.advanced_values
 
-
-# Removed Button for now...
-#if st.button('Find Perfect Compatibility Dates'):
-    #birth_date = date(byear, bmonth, bday)
-
-# DataFrame setup and display
+## DataFrame setup ##
 columns = ['Compatible Dates',
            'Overall Compatibility',
            'Physical',
@@ -200,8 +247,15 @@ good_order = ['Compatible Dates',
            'Physical',
            'Birth Sign'
            ]
+# Checks if advanced options expander is open or closed
+if st.session_state.advanced == True:
+    good_compat_dates = find_good_compat_dates(
+        birth_date,
+        years=nyears,
+        thresholds=st.session_state.advanced_values)
+elif st.session_state.advanced == False:
+    good_compat_dates = find_good_compat_dates(birth_date, years=nyears)
 
-good_compat_dates = find_good_compat_dates(birth_date, years=nyears)
 gdf = pd.DataFrame(good_compat_dates, columns=columns)
 gdf = gdf.astype({'Birth Sign':'category'})
 a_col_config = {
@@ -210,7 +264,13 @@ a_col_config = {
     'Intellectual':st.column_config.NumberColumn(format='percent')#,
     #'Overall Compatibility':st.column_config.NumberColumn(format='percent')
     }
+
+
+
+# Write total number of matches from current dataframe
 st.write(f'Found {gdf.shape[0]} matches')
+
+## DataFrame display ##
 a = st.dataframe(gdf[good_order],
              selection_mode='single-row',
              column_config=a_col_config,
@@ -220,19 +280,21 @@ a = st.dataframe(gdf[good_order],
 # Static Table
 #st.table(gdf.set_index(columns[0]).style.format({columns[2]: '{:.2f}'}))
 
-# Bar chart setup and display
+## Bar chart setup and display ##
 try:
     #st.write()
-    b = bio_compat(birth_date, gdf.iloc[a.get('selection')['rows'][0]].iloc[0])[0]
+    other_date = gdf.iloc[a.get('selection')['rows'][0]].iloc[0]
+    b = bio_compat(birth_date, other_date)[0]
     bdf = pd.DataFrame([b],columns=['Physical', 'Emotional', 'Intellectual'])
     # Setting index to display on static table of selected match
-    bdf.index = ['Compatibility on Day of Birth']
+    #bdf.index = ['Compatibility on Day of Birth']
+    bdf.index = [other_date]
     # To get percentage
     bdf = bdf.mul(100)
     #bvals = np.array([x for x in b.values()])
-    bdfd = bdf[:]
+    bdfd = bdf.copy()
     bdfd['Overall'] = bdfd.mean(axis=1, numeric_only=True)
-    order = ['Overall', 'Emotional', 'Intellectual', 'Physical']
+    order = ['Emotional', 'Intellectual', 'Physical', 'Overall']
     
     st.table(bdfd[order])
     # Blanking index because it shows funny on the screen
