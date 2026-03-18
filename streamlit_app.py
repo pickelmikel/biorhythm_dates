@@ -7,7 +7,7 @@ import streamlit as st
 #fig = px.bar(df, x='Category', y='Value')
 #fig.update_xaxes(tickangle=0)  # 0 degrees = horizontal labels
 #st.plotly_chart(fig)
-disclaimer = "Disclaimer: Due to the early stage of development, information provided may be inaccurate or change without notice. Currently finds dates with all cycles at least 80%."
+disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice. Currently finds dates with all cycles at least 80%."
 
 def biorhythm_high_res(birth_date, target_date):
     # Calculate age in days
