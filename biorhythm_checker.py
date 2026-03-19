@@ -13,7 +13,7 @@ def bio_compat(your_birth, other_birth):
         form_final = form * 100
         st.write(f"{cycle} Cycle Percent Compatibility: {abs(form_final):.2f}")
     #return cycle_data, np.array([*cycle_data.values()]).mean() * 100
-    cycle_mean = np.array([*cycle_data.values()]).mean() * 100
+    cycle_mean = round(np.array([*cycle_data.values()]).mean() * 100,2)
     st.write(f'Overall Compatibility: {cycle_mean} Percent')
   
 ## -- MAIN DISPLAY CODE -- ##
