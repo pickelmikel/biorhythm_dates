@@ -5,9 +5,6 @@ import streamlit as st
 
 disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice."
 
-perfect_compat_finder = st.Page('streamlit_app.py')
-
-
 def check_state():
     if 'advanced' not in st.session_state:
         st.session_state.advanced = False
@@ -227,7 +224,7 @@ nyears = st.number_input('How many years difference to display:',
                          value=4,
                          key='nyears')
 
-## Advanced explander section ##
+## Advanced expander section ##
 with st.expander('Advanced Options', on_change=set_advanced) as advanced_options:
     st.write('Select Cycle Thresholds')
     E = st.slider('Emotional',
