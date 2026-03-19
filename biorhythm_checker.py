@@ -38,6 +38,7 @@ def day_compat(your_birth, other_birth, base_date=date.today()):
 
 
 ## -- MAIN DISPLAY CODE -- ##
+st.info(st.session_state.disclaimer)
 st.title('Biorhythm Compatibility Checker')
 
 birth_date = st.date_input('Select your birthdate',

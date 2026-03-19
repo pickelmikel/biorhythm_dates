@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice."
 
 def check_state():
     if 'advanced' not in st.session_state:
@@ -207,7 +206,7 @@ def show_details():
 
 
 ## -- MAIN DISPLAY CODE -- ##
-st.info(disclaimer)
+st.info(st.session_state.disclaimer)
 st.title('Perfect Compatibility Finder')
 
 ## User Input widgets ##

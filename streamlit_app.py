@@ -1,5 +1,7 @@
 import streamlit as st
 
+st.session_state.disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice."
+
 perfect_compat_finder = st.Page('perfect_compatibility_finder.py',
     title='Perfect Compatibility Finder')
 biorhythm_checker = st.Page('biorhythm_checker.py',
