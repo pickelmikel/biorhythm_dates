@@ -2,12 +2,11 @@ from datetime import date, datetime, timedelta
 import numpy as np
 import pandas as pd
 import streamlit as st
-#import plotly.express as px
 
-#fig = px.bar(df, x='Category', y='Value')
-#fig.update_xaxes(tickangle=0)  # 0 degrees = horizontal labels
-#st.plotly_chart(fig)
 disclaimer = "Disclaimer: Due to the early stage of development, information provided may change without notice."
+
+perfect_compat_finder = st.Page('streamlit_app.py')
+
 
 def check_state():
     if 'advanced' not in st.session_state:
