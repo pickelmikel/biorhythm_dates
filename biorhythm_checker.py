@@ -19,10 +19,9 @@ def bio_compat(your_birth, other_birth):
         form = np.cos(np.pi * t.days / value)
         cycle_data[cycle] = abs(form)
         form_final = form * 100
-        st.write(f"{cycle} Cycle Percent Compatibility: {abs(form_final):.2f}")
-    #return cycle_data, np.array([*cycle_data.values()]).mean() * 100
-    cycle_mean = round(np.array([*cycle_data.values()]).mean() * 100,2)
-    st.write(f'Overall Compatibility: {cycle_mean} Percent')
+        #st.write(f"{cycle} Cycle Percent Compatibility: {abs(form_final):.2f}")
+    cycle_data['Overall'] = round(np.array([*cycle_data.values()]).mean() * 100,3)
+    return cycle_data
 
 @st.cache_data
 def day_compat(your_birth, other_birth, base_date=date.today()):
@@ -61,6 +60,7 @@ def update_base_slider():
 st.info(st.session_state.disclaimer)
 st.title('Biorhythm Compatibility Checker')
 
+# Birthday selection for two individuals
 birth_date = st.date_input('Select your birthdate',
                            #value=date(2000,1,1),
                            min_value=date(1900,1,1),
@@ -73,41 +73,48 @@ other_date = st.date_input('Select other birthdate',
                            max_value=date.today(),
                            key='other_birthdate',
                            format='YYYY-MM-DD')
-# Sets lower date limit to earlier date
-limit_date = set_limit_date(birth_date,other_date)
 
+# Sets lower date limit to earlier date
+limit_date = set_limit_date(birth_date,other_date)#may be removed
+
+# Shows your overall average compatibility for each cycle
 st.write('Compatibility at Birth')
-bio_compat(birth_date,other_date)
+bio_compat_result = bio_compat(birth_date,other_date)
+st.markdown(
+        f":blue-badge[Emotional {bio_compat_result.get('Emotional')*100}%]\
+        :green-badge[Intellectual {bio_compat_result.get('Intellectual')*100}%]\
+        :red-badge[Physical {bio_compat_result.get('Physical')*100}%]",
+        unsafe_allow_html=True
+    )
+
+
 st.divider()
 
+# Sets max and min values for chart display
 chart_min_value=date.today() - timedelta(days=90)
 chart_max_value=date.today() + timedelta(days=90)
 
-st.write('Select date below to see your compatibility on that date')
-base_date = st.date_input('Compatibility Date',
+# Check specific date compatibility
+with st.expander(label='Expand to see \
+compatibility for a specific date', expanded=False) as bio_check_date:
+    #st.write('')
+    base_date = st.date_input('Compatibility Date',
           min_value=chart_min_value,
           max_value=chart_max_value,
           format='YYYY-MM-DD',
           key='base_date')
-
-base_date_slider = """st.slider('Compatibility Date',
-          value=date.today(),
-          min_value=chart_min_value,
-          max_value=chart_max_value,
-          format='YYYY-MM-DD',
-          step=timedelta(days=1),
-          key='base_date_slider',
-          disabled=False)"""
-
-
-phase_dict, compat_dict = day_compat(birth_date,other_date,base_date)
-#st.write(f'Compatibility for: {base_date}')
-for cycle,value in compat_dict.items():
-    st.write(f'{cycle} Cycle:  {value*100:.2f} %')
-    #st.write(f'{cycle} Cycle: phase_difference: {phase_diff:.3f}, compatiblity_score: {compat:.3f}')
+    phase_dict, compat_dict = day_compat(birth_date,other_date,base_date)
+    st.markdown(
+        f":blue-badge[Emotional {compat_dict.get('Emotional')*100}%]\
+        :green-badge[Intellectual {compat_dict.get('Intellectual')*100}%]\
+        :red-badge[Physical {compat_dict.get('Physical')*100}%]",
+        unsafe_allow_html=True
+    )
+        #st.write(f'{cycle} Cycle:  {value*100:.2f} %')
+        #st.write(f'{cycle} Cycle: phase_difference: {phase_diff:.3f}, compatiblity_score: {compat:.3f}')
 
 ## Chart Config ##
-#st.write(compat_dict)
+#st.write(compat_dict)#test display
 
 # Generate a list of dates for the slider and animation
 start_date = date.today()
@@ -169,7 +176,7 @@ fig = go.Figure(
     data=[
         go.Scatterpolar(r=all_scores[slider_init_idx],
             theta=categories + [categories[0]],
-            fill='toself',
+            fill='toself'
             #text=text_labels,
             #textposition='top center',
             #mode='lines+markers+text'
@@ -198,9 +205,9 @@ fig.update_layout(
         currentvalue=dict(prefix="Date: ", visible=True, xanchor='right'),
         active=slider_init_idx  # This sets the initial slider position to today
     )],
-    title=f'Biorhythm Compatibility Radar Chart (Use slider to change dates. You can spin the Radar Wheel)',
+    title=f'Biorhythm Compatibility Radar for Previous and Future 90 days',
     template='plotly_dark'
 )
 #st.write(all_scores)
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width='stretch')
